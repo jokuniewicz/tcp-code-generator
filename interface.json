@@ -1,0 +1,6 @@
+{
+  "SensorData": {
+    "sensor_id": "int",
+    "temperature": "float"
+  }
+}

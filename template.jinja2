@@ -1,0 +1,20 @@
+import struct
+
+{% for msg_name, fields in messages.items() %}
+class {{ msg_name }}:
+    def __init__(self, {% for f_name in fields.keys() %}{{ f_name }}{% if not loop.last %}, {% endif %}{% endfor %}):
+{% for f_name in fields.keys() %}
+        self.{{ f_name }} = {{ f_name }}
+{% endfor %}
+
+    def serialize(self):
+        # 'i' to int (4 bajty), 'f' to float (4 bajty)
+        fmt = "={% for f_type in fields.values() %}{% if f_type == 'int' %}i{% elif f_type == 'float' %}f{% endif %}{% endfor %}"
+        return struct.pack(fmt, {% for f_name in fields.keys() %}self.{{ f_name }}{% if not loop.last %}, {% endif %}{% endfor %})
+
+    @staticmethod
+    def deserialize(data):
+        fmt = "={% for f_type in fields.values() %}{% if f_type == 'int' %}i{% elif f_type == 'float' %}f{% endif %}{% endfor %}"
+        unpacked = struct.unpack(fmt, data)
+        return {{ msg_name }}(*unpacked)
+{% endfor %}
